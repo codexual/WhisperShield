@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>WhisperShield Options v0.0.1</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  textarea, input[type=text], input[type=password], input[type=number], select {
+    width:100%; box-sizing:border-box; font-family:monospace; margin-bottom:6px;
+  }
+  h2,h3 { margin:0.6em 0 0.3em; }
+  label { display:block; margin:6px 0; }
+  .row { display:flex; gap:16px; flex-wrap:wrap; }
+  .col { flex:1 1 280px; min-width:260px; }
+  #saveStatus { min-height:20px; }
+  .credits { background:#222; border-radius:4px; padding:8px 8px 8px 10px; margin-top:8px; }
+  .credits a { color:#FFD700; font-weight:bold; font-size:14px; text-decoration:none; margin-right:14px;}
+  .credits a:hover { color:#fff200; text-decoration:underline; }
+  .auth-radio-group label { display:inline-block; margin-right:14px; }
+  #clientSecretRow { margin-left:22px; margin-top:8px; }
+  .cat-group { border:1px solid #ff9500; border-radius:6px; padding:10px; margin-bottom:8px; }
+  .list-group { border:1px solid #FFD700; border-radius:6px; padding:10px; margin-bottom:8px; }
+  .pauseRow { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  #pauseTimerInfo { font-size:12px; opacity:.75; }
+  #pauseCustomMins { width:90px; }
+  .sectionHeader { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; }
+  .saveResult { font-size:11px; min-width:120px; }
+</style>
+</head>
+<body data-theme="dark">
+<h2>WhisperShield Settings v0.0.1</h2>
+
+<div class="section">
+  <div class="sectionHeader">
+    <h3>Protection Control</h3>
+    <div>
+      <button class="sectionSaveBtn" data-save-scope="control">Save</button>
+      <span id="saveResult-control" class="saveResult muted"></span>
+    </div>
+  </div>
+  <div class="pauseRow">
+    <button id="pauseBtn" class="pause">Pause Protection</button>
+    <select id="pauseTimerSelect" style="width:140px;">
+      <option value="0">Indefinite</option>
+      <option value="60">1 hour</option>
+      <option value="120">2 hours</option>
+      <option value="240">4 hours</option>
+      <option value="480">8 hours</option>
+      <option value="custom">Custom minutes…</option>
+    </select>
+    <input id="pauseCustomMins" type="number" min="1" placeholder="mins" style="display:none;">
+    <span id="pauseTimerInfo" class="small muted"></span>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sectionHeader">
+    <h3>Authentication</h3>
+    <div>
+      <button class="sectionSaveBtn" data-save-scope="auth">Save</button>
+      <span id="saveResult-auth" class="saveResult muted"></span>
+    </div>
+  </div>
+  <label>Client ID <input id="clientId" type="text" placeholder="Twitch Client ID"></label>
+  <div class="auth-radio-group" style="margin-bottom:6px;">
+    <label><input type="radio" name="authMode" value="none"> No Token (DOM only)</label>
+    <label><input type="radio" name="authMode" value="app"> App Token (Client Credentials)</label>
+    <label><input type="radio" name="authMode" value="implicit"> User Login (Implicit OAuth)</label>
+  </div>
+  <div id="clientSecretRow" style="display:none;">
+    <label>Client Secret <input id="clientSecret" type="password" placeholder="Only for App Token mode"></label>
+  </div>
+  <div class="small muted" style="margin-bottom:6px;">
+    App Token = client credentials. User Login = implicit user token. No Token = DOM parsing only.
+  </div>
+  <div id="authStatus" class="muted small" style="margin:6px 0;"></div>
+  <div style="display:flex; gap:6px; flex-wrap:wrap;">
+    <button id="loginTwitch" type="button">Sign In (User)</button>
+    <button id="clearToken" type="button">Clear Token</button>
+  </div>
+</div>
+
+<div class="section cat-group">
+  <div class="sectionHeader">
+    <h3>Categories</h3>
+    <div>
+      <button class="sectionSaveBtn" data-save-scope="categories">Save</button>
+      <span id="saveResult-categories" class="saveResult muted"></span>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <label>Safe Categories
+        <textarea id="safeCategories" placeholder="ASMR"></textarea>
+      </label>
+    </div>
+    <div class="col">
+      <label>Blacklist Categories
+        <textarea id="blacklistCategories"></textarea>
+      </label>
+    </div>
+  </div>
+</div>
+
+<div class="section list-group">
+  <div class="sectionHeader">
+    <h3>Streamer Lists (Local)</h3>
+    <div>
+      <button class="sectionSaveBtn" data-save-scope="streamers">Save</button>
+      <span id="saveResult-streamers" class="saveResult muted"></span>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <label>Whitelist Streamers
+        <textarea id="whitelist"></textarea>
+      </label>
+    </div>
+    <div class="col">
+      <label>Greylist Streamers
+        <textarea id="greylistStreamers"></textarea>
+      </label>
+    </div>
+    <div class="col">
+      <label>Blacklist Streamers
+        <textarea id="blacklistStreamers"></textarea>
+      </label>
+      <label class="small"><input type="checkbox" id="autoGreylist"> Auto-add source on unsafe raid</label>
+    </div>
+  </div>
+</div>
+
+<div class="section list-group">
+  <div class="sectionHeader">
+    <h3>Remote Lists</h3>
+    <div>
+      <button class="sectionSaveBtn" data-save-scope="remote">Save</button>
+      <span id="saveResult-remote" class="saveResult muted"></span>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <label><input type="checkbox" id="enableRemoteWhitelist"> Enable Remote Whitelist</label>
+      <label>Remote Whitelist URL <input id="remoteWhitelistUrl" type="text"></label>
+      <div id="remoteWhitelistCount" class="small muted"></div>
+    </div>
+    <div class="col">
+      <label><input type="checkbox" id="enableRemoteGreylist"> Enable Remote Greylist</label>
+      <label>Remote Greylist URL <input id="remoteGreylistUrl" type="text"></label>
+      <div id="remoteGreylistCount" class="small muted"></div>
+    </div>
+    <div class="col">
+      <label><input type="checkbox" id="enableRemoteBlacklist"> Enable Remote Blacklist</label>
+      <label>Remote Blacklist URL <input id="remoteBlacklistUrl" type="text"></label>
+      <div id="remoteBlacklistCount" class="small muted"></div>
+    </div>
+  </div>
+  <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:6px;">
+    <label>TTL Minutes <input id="remoteTtlMinutes" type="number" min="1" value="30" style="width:90px;"></label>
+    <button id="refreshRemote" type="button">Refresh Remote Now</button>
+    <span id="remoteLastFetched" class="small muted"></span>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sectionHeader">
+    <h3>Behavior</h3>
+    <div>
+      <button class="sectionSaveBtn" data-save-scope="behavior">Save</button>
+      <span id="saveResult-behavior" class="saveResult muted"></span>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <label>Redirect Behavior
+        <select id="redirectBehavior">
+          <option value="close">Close tab</option>
+          <option value="redirectCustom">Redirect Custom URL</option>
+          <option value="whitelist">Redirect to live whitelisted streamer</option>
+        </select>
+      </label>
+      <label>Custom Redirect URL <input id="customRedirectUrl" type="text" placeholder="https://..."></label>
+      <label>Grace Window (ms) <input id="graceWindowMs" type="number" min="0"></label>
+      <label>Raid Poll Interval (ms) <input id="raidPollMs" type="number" min="300"></label>
+    </div>
+    <div class="col">
+      <label><input type="checkbox" id="strictImmediateBlock"> Strict immediate block</label>
+      <label><input type="checkbox" id="inferRaidFromUrl" checked> Infer raid from URL referrer</label>
+      <button id="resetBlockedCount" type="button">Reset Blocked Count</button>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sectionHeader">
+    <h3>Debug / Logging</h3>
+    <div>
+      <button class="sectionSaveBtn" data-save-scope="debug">Save</button>
+      <span id="saveResult-debug" class="saveResult muted"></span>
+    </div>
+  </div>
+  <label class="small"><input type="checkbox" id="debugToggle"> Enable Debug Logging (disabled by default)</label>
+</div>
+
+<div class="section">
+  <div class="sectionHeader">
+    <h3>Logs</h3>
+    <div>
+      <button class="sectionSaveBtn" data-save-scope="logs">Save</button>
+      <span id="saveResult-logs" class="saveResult muted"></span>
+    </div>
+  </div>
+  <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+    <button id="refreshLogs" type="button">Refresh Logs</button>
+    <button id="clearLogs" type="button">Clear Logs</button>
+    <button id="downloadLogs" type="button">Download Logs</button>
+    <button id="emitTestLog" type="button">Test Log</button>
+    <label style="flex:1;">Filter <input id="logFilter" type="text" placeholder="filter..."></label>
+  </div>
+  <pre id="logsOut"></pre>
+</div>
+
+<div class="section credits">
+  <h3 style="margin-bottom:4px;">Credits / Links</h3>
+  <div>
+    <a href="https://github.com/codexual" target="_blank">GitHub</a>
+    <a href="https://twitch.tv/codexual" target="_blank">Twitch</a>
+    <a href="https://youtube.com/codexual" target="_blank">YouTube</a>
+    <a href="https://twitter.com/codexual" target="_blank">Twitter/X</a>
+    <a href="https://paypal.me/codexual" target="_blank">Donate (PayPal)</a>
+  </div>
+</div>
+
+<div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:10px;">
+  <button id="saveAll">Save ALL Sections</button>
+  <button id="reloadSettings">Reload</button>
+  <button id="toggleTheme">Toggle Theme</button>
+  <button id="exportSettings">Export</button>
+  <label style="margin:0;">
+    Import <input id="importSettingsFile" type="file" accept="application/json" style="display:none;">
+    <span style="border:1px solid #FFD700; padding:3px 8px; cursor:pointer;" onclick="document.getElementById('importSettingsFile').click()">Choose File</span>
+  </label>
+  <span id="saveStatus" class="small muted"></span>
+</div>
+
+<div id="updateStatus" class="small muted" style="margin-top:6px;"></div>
+
+<script src="options.js"></script>
+</body>
+</html>
