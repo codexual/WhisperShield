@@ -47,6 +47,19 @@ That’s it.
 
 ---
 
+### Note on Remote Lists
+If you enable **Remote Lists** (Whitelist, Greylist, or Blacklist):  
+
+These streamers are included based on my **personal experience** — either positive or negative.  
+- Whitelist: Streamers I enjoy and trust.  
+- Greylist: Streamers under review.  
+- Blacklist: Streamers who caused unpleasant experiences (e.g., dumping raids into non-ASMR categories).  
+
+This is **not a witch-hunt**, nor do I encourage such behavior.  
+It’s simply a way to avoid inconsiderate ASMR streamers who raid into loud or unrelated categories that can be disruptive (like waking people up).  
+
+---
+
 ## Minimal Setup (Recommended Defaults)
 
 Open the options/settings (or JSON if you’re editing directly):
