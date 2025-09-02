@@ -86,30 +86,6 @@ No client secret is ever needed for implicit user flow. Leave `clientSecret` bla
 
 ---
 
-## IMPORTANT: Do Not Commit Secrets
-
-Never commit a Twitch Client Secret to this repository. If you ever did:
-1. Reset it in the Twitch Developer Console.
-2. Remove it from all code.
-3. Rewrite git history to purge (see “Secret Removal” below).
-4. Force push.
-
-### Secret Removal (If You Slipped Once)
-
-```bash
-pip install git-filter-repo
-git filter-repo --replace-text <(cat <<'EOF'
-YOUR_OLD_CLIENT_ID==REDACTED_CLIENT_ID
-YOUR_OLD_CLIENT_SECRET==REDACTED_CLIENT_SECRET
-EOF
-)
-git push --force origin main
-```
-
-Then verify via GitHub code search.
-
----
-
 ## Event Flow Examples
 
 Blacklisted raid:
@@ -150,28 +126,6 @@ Enable any subset (whitelist / blacklist / greylist). Lists are fetched, normali
 | Stop auto greylist logging | Set `autoGreylist` to false. |
 | More aggressive blocking | Shorten `graceWindowMs` or (future tweak) treat unknown as unsafe. |
 | Debug | Ensure `debugLogging` (if present) is true. |
-
----
-
-## Contributing
-
-1. Fork.
-2. Create a feature branch.
-3. Make minimal, self‑contained changes.
-4. Update README if behavior changes.
-5. Open a PR with: purpose, summary of changes, test steps.
-
-Coding style preference: small pure helpers, consistent log event names, no unnecessary dependencies.
-
----
-
-## Roadmap Ideas (Open to PRs)
-
-- Instant mute on raid until safe verified.
-- “Sleep mode” (treat all non‑whitelist as unsafe during set hours).
-- Per‑streamer custom actions.
-- Export/import lists.
-- Auto‑rotate between whitelist channels on redirect.
 
 ---
 
