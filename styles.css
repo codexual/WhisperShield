@@ -1,0 +1,81 @@
+/* WhisperShield styles.css v0.0.1 */
+/* Added wrapping & box styling for logs (#logsOut) to prevent horizontal scrolling overflow. */
+
+body[data-theme="dark"] {
+  background:#18181b;
+  color:#e3e6eb;
+  font:14px/1.4 system-ui,sans-serif;
+}
+body[data-theme="light"] {
+  background:#f8f8f9;
+  color:#111;
+  font:14px/1.4 system-ui,sans-serif;
+}
+button {
+  background:#2d2f35;
+  color:#FFD700;
+  border:1px solid #FFD700;
+  padding:4px 10px;
+  border-radius:4px;
+  font:13px system-ui,sans-serif;
+  font-weight:600;
+  cursor:pointer;
+}
+button:hover {
+  background:#FFD700;
+  color:#222;
+}
+textarea, input[type=text], input[type=password], input[type=number], select {
+  background:#202226;
+  color:#e3e6eb;
+  border:1px solid #444;
+  border-radius:4px;
+  padding:4px 6px;
+  font:13px monospace;
+  box-sizing:border-box;
+}
+body[data-theme="light"] textarea,
+body[data-theme="light"] input[type=text],
+body[data-theme="light"] input[type=password],
+body[data-theme="light"] input[type=number],
+body[data-theme="light"] select {
+  background:#fff;
+  color:#111;
+  border:1px solid #bbb;
+}
+.section {
+  border:1px solid #444;
+  padding:10px;
+  margin:10px 0;
+  border-radius:6px;
+  background:rgba(255,255,255,0.02);
+}
+body[data-theme="light"] .section {
+  border-color:#999;
+  background:#fff;
+}
+.status.error { color:#ff4d4d; }
+.muted { opacity:.75; }
+.small { font-size:12px; }
+.sectionSaveBtn { margin-top:6px; display:inline-block; }
+.saveResult { font-size:11px; margin-left:6px; min-height:14px; }
+.saveResult.error { color:#ff4d4d; }
+
+/* LOG BOX IMPROVEMENT */
+#logsOut {
+  background:#111;
+  border:1px solid #444;
+  border-radius:4px;
+  padding:8px;
+  max-height:340px;
+  overflow:auto;
+  white-space:pre-wrap;
+  word-break:break-word;
+  font-size:12px;
+  line-height:1.35;
+}
+body[data-theme="light"] #logsOut {
+  background:#f8f8f9;
+  border-color:#bbb;
+  color:#222;
+}
