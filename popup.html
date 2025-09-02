@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>WhisperShield</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  body { width:300px; margin:0; font:13px/1.4 system-ui,sans-serif; background:#1d1f23; color:#e3e6eb; }
+  h1 { font-size:16px; margin:10px 0 6px; }
+  .section { padding:8px 10px; border-bottom:1px solid #333; }
+  button { cursor:pointer; }
+  #updateBanner { display:none; background:#332400; border:1px solid #a67c00; padding:6px; margin:6px 0; border-radius:4px; }
+  #updateBanner strong { color:#ffd65c; }
+  a { color:#7aa8ff; text-decoration:none; }
+  .credits a { display:block; font-size:12px; }
+  .pauseRow { display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-top:8px; }
+  #pauseTimerInfo { font-size:11px; opacity:.75; }
+  .miniInput { width:60px; }
+</style>
+</head>
+<body>
+  <div class="section">
+    <h1>WhisperShield v0.0.1</h1>
+    <div>Blocked raids / navs: <strong id="blockedCount">0</strong></div>
+
+    <div class="pauseRow">
+      <button id="pauseBtn" class="pause">Pause Protection</button>
+      <select id="pauseTimerSelect">
+        <option value="0">Indefinite</option>
+        <option value="60">1h</option>
+        <option value="120">2h</option>
+        <option value="240">4h</option>
+        <option value="480">8h</option>
+        <option value="custom">Custom</option>
+      </select>
+      <input id="pauseCustomMins" class="miniInput" type="number" min="1" placeholder="mins" style="display:none;">
+      <span id="pauseTimerInfo"></span>
+    </div>
+
+    <div class="btns" style="margin-top:6px; display:flex; gap:6px; flex-wrap:wrap;">
+      <button id="refreshBtn">Refresh</button>
+      <button id="openOptions">Options</button>
+      <button id="viewRepo">Repo</button>
+    </div>
+
+    <div id="updateBanner">
+      <div><strong>Update Available!</strong></div>
+      <div>Local: <span class="localVersion"></span> → Remote: <span class="remoteVersion"></span></div>
+      <div style="margin-top:4px; display:flex; gap:6px;">
+        <button id="viewRepo2">Open Repo</button>
+        <button id="ignoreUpdate">Ignore</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section credits">
+    <strong>Credits / Links</strong>
+    <a href="https://github.com/codexual" target="_blank">GitHub</a>
+    <a href="https://twitch.tv/codexual" target="_blank">Twitch</a>
+    <a href="https://youtube.com/codexual" target="_blank">YouTube</a>
+    <a href="https://twitter.com/codexual" target="_blank">Twitter/X</a>
+    <a href="https://paypal.me/codexual" target="_blank">Donate (PayPal)</a>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
