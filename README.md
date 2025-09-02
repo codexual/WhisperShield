@@ -193,7 +193,7 @@ Only optional Twitch API requests (standard Helix endpoints). Lists/logs stay lo
 
 ## License
 
-(Choose one—MIT suggested; add a LICENSE file if desired.)
+
 
 ```
 MIT License © 2025 Codexual
