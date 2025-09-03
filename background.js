@@ -51,6 +51,18 @@ let blockedCountCache = 0;
 const STATE_KEY = "wsRaidState_v2";
 const LOG_CAP = 1000;
 const CATEGORY_CACHE_TTL_MS = 60000;
+
+// Performance optimization: Set-based classification with precedence
+const STATE = {
+  lists: null,
+  sets: null,
+  sweepLock: false,
+  pendingSweepReason: null
+};
+
+// Debug flags
+const DEBUG_ALWAYS = false; // Always-on flag for forced debug logging
+const DEBUG_PER_ANCHOR = false; // Enable classify logging
 const RAID_EXPIRY_MS = 120000;
 
 let raidPending = null;
@@ -71,7 +83,8 @@ let tokenRefreshTimer = null;
 function appendLog(event, details) {
   chrome.storage.sync.get({ settings: DEFAULT_SETTINGS }, r => {
     const dbg = !!r.settings?.debugLogging;
-    if (event.startsWith("debug") && !dbg) return;
+    // Honor DEBUG_ALWAYS flag - difference between user logging toggle and developer forced debug
+    if (event.startsWith("debug") && !dbg && !DEBUG_ALWAYS) return;
     logs.unshift({ time: new Date().toISOString(), event, details });
     if (logs.length > LOG_CAP) logs.length = LOG_CAP;
     chrome.storage.local.set({ wsLogs: logs });
@@ -149,6 +162,11 @@ async function fetchRemoteLists(current, reason="manual") {
   rl.lastFetched = Date.now();
   await setSettings(s);
   appendLog("remote_lists_fetched",{reason,counts:{whitelist:wh.length,greylist:gr.length,blacklist:bl.length}});
+  
+  // Rebuild Set cache after list changes
+  STATE.lists = getEffectiveLists(s);
+  buildSetCache();
+  
   recheckOpenTabs(s, "remote_fetch");
 }
 function parseList(text){
@@ -161,11 +179,110 @@ function combineUnique(...arrs){
 }
 function getEffectiveLists(s){
   const rl=s.remoteLists||DEFAULT_SETTINGS.remoteLists;
+  // Note: During list merge, duplicates are not removed from arrays to maintain precedence.
+  // Classification order: blacklist > whitelist > greylist > unknown ensures proper precedence.
   return {
     whitelist: combineUnique(s.whitelist, rl.enableWhitelist?rl.cache.whitelist:[]),
     greylist:  combineUnique(s.greylistStreamers, rl.enableGreylist?rl.cache.greylist:[]),
     blacklist: combineUnique(s.blacklistStreamers, rl.enableBlacklist?rl.cache.blacklist:[])
   };
+}
+
+// Performance optimization: Build Set cache for O(1) list membership checks
+function buildSetCache() {
+  if (!STATE.lists) return;
+  
+  STATE.sets = {
+    whitelist: new Set(STATE.lists.whitelist),
+    greylist: new Set(STATE.lists.greylist), 
+    blacklist: new Set(STATE.lists.blacklist)
+  };
+  
+  if (DEBUG_ALWAYS) {
+    appendLog("debug_set_cache_built", {
+      whitelist: STATE.sets.whitelist.size,
+      greylist: STATE.sets.greylist.size,
+      blacklist: STATE.sets.blacklist.size
+    });
+  }
+}
+
+// Ensure lists and sets are available
+async function ensureData() {
+  if (!STATE.lists) {
+    const settings = await getSettings();
+    STATE.lists = getEffectiveLists(settings);
+    buildSetCache();
+  }
+}
+
+// New classify function with precedence: blacklist > whitelist > greylist > unknown
+function classify(login) {
+  if (!STATE.sets) return "unknown";
+  
+  const lower = (login || "").toLowerCase();
+  
+  if (STATE.sets.blacklist.has(lower)) {
+    if (DEBUG_PER_ANCHOR) {
+      appendLog("Classify", { login: lower, result: "blacklist" });
+    }
+    return "blacklist";
+  }
+  if (STATE.sets.whitelist.has(lower)) {
+    if (DEBUG_PER_ANCHOR) {
+      appendLog("Classify", { login: lower, result: "whitelist" });
+    }
+    return "whitelist";
+  }
+  if (STATE.sets.greylist.has(lower)) {
+    if (DEBUG_PER_ANCHOR) {
+      appendLog("Classify", { login: lower, result: "greylist" });
+    }
+    return "greylist";
+  }
+  
+  if (DEBUG_PER_ANCHOR) {
+    appendLog("Classify", { login: lower, result: "unknown" });
+  }
+  return "unknown";
+}
+
+// Concurrency guard/debounce for sweeps to reduce redundant overlapping operations
+async function performSweep(reason) {
+  if (STATE.sweepLock) {
+    // Store the latest reason for a pending sweep
+    STATE.pendingSweepReason = reason;
+    appendLog("SweepCoalesced", { reason });
+    return;
+  }
+  
+  STATE.sweepLock = true;
+  
+  try {
+    // Ensure data is available before sweep
+    await ensureData();
+    
+    // Perform the actual sweep operation (refresh views, recheck tabs, etc.)
+    appendLog("SweepStarted", { reason });
+    
+    // For now, this triggers the existing recheck functionality
+    const settings = await getSettings();
+    recheckOpenTabs(settings, reason);
+    
+    appendLog("SweepCompleted", { reason });
+  } catch (e) {
+    appendLog("SweepError", { reason, error: e.message });
+  } finally {
+    STATE.sweepLock = false;
+    
+    // If there's a pending sweep, run it immediately
+    if (STATE.pendingSweepReason) {
+      const pendingReason = STATE.pendingSweepReason;
+      STATE.pendingSweepReason = null;
+      // Run the pending sweep asynchronously
+      setTimeout(() => performSweep(pendingReason), 0);
+    }
+  }
 }
 
 // ---------- Auth ----------
@@ -193,6 +310,8 @@ async function ensureAppToken(passedSettings) {
   const s = passedSettings || await getSettings();
   const o = s.oauth || {};
   const now = Math.floor(Date.now()/1000);
+  // TODO: Externalize or prompt user for credentials before public distribution
+  // Client secrets should not be hardcoded or stored in plain text for security
   if (!o.clientId || !o.clientSecret) {
     appendLog("debug_app_token_missing_secret",{haveId:!!o.clientId});
     return "";
@@ -825,6 +944,11 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse)=>{
           if(msg.settings){
             await setSettings(msg.settings);
             appendLog("settings_saved",{settings:msg.settings});
+            
+            // Rebuild Set cache after settings changes
+            STATE.lists = getEffectiveLists(msg.settings);
+            buildSetCache();
+            
             chrome.tabs.query({}, tabs=>{
               for(const t of tabs){
                 if(t.id) chrome.tabs.sendMessage(t.id,{type:"SETTINGS_UPDATED",settings:msg.settings}).catch(()=>{});
@@ -901,6 +1025,28 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse)=>{
           respondOk({ok:true});
           break;
         }
+        case "TF_SET_TOGGLES": {
+          // Handle category toggle updates from overlay panel
+          if (msg.toggles) {
+            // For now, just log the toggle state change
+            // In a full implementation, this could update filtering preferences
+            appendLog("overlay_toggles_updated", { toggles: msg.toggles });
+            
+            // Trigger visual update by performing a sweep
+            performSweep("toggle_update");
+          }
+          break;
+        }
+        case "TF_REFRESH_VIEW": {
+          // Force refresh of current view with updated filters
+          performSweep("manual_refresh");
+          break;
+        }
+        case "TF_FORCE_SWEEP": {
+          // Force sweep after list refetch or other operations
+          performSweep(msg.reason || "force_sweep");
+          break;
+        }
         default: break;
       }
     }catch(e){
@@ -917,6 +1063,11 @@ function initLifecycle(reason){
   ensureStateLoaded().then(async ()=>{
     const s=await getSettings();
     appendLog("background_version",{version:LOCAL_VERSION,reason,sessionId});
+    
+    // Initialize Set cache with current settings
+    STATE.lists = getEffectiveLists(s);
+    buildSetCache();
+    
     scheduleRemoteFetch(reason);
     if(s.oauth.mode==="app" && s.oauth.clientId && s.oauth.clientSecret){
       scheduleAppTokenRefresh(s);

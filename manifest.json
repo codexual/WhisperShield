@@ -28,6 +28,17 @@
       "matches": ["https://*.twitch.tv/*"],
       "js": ["content.js"],
       "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://www.twitch.tv/directory/category/asmr*"],
+      "js": ["overlay_panel.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["overlay_panel.css"],
+      "matches": ["https://*.twitch.tv/*"]
     }
   ]
 }

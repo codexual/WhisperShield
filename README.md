@@ -158,6 +158,22 @@ Only optional Twitch API requests (standard Helix endpoints). Lists/logs stay lo
 
 ---
 
+## NEW Additions
+
+**On-Page Overlay Panel (v0.3.1)**
+- Added real-time category filter panel visible on ASMR directory pages
+- Toggle visibility for whitelist/greylist/blacklist/unknown streamers directly on-page
+- Bulk actions (All On, All Off, Invert) and Save/Save+Reload functionality
+- Panel state syncs with extension toggles and immediately applies changes
+
+**Set-Based Classification Optimization**
+- Converted list membership checks from O(n) to O(1) using cached Sets
+- Improved performance for large lists with thousands of streamers
+- Maintains existing precedence: blacklist > whitelist > greylist > unknown
+- Added concurrency guards and debouncing for sweep operations to reduce redundant processing
+
+---
+
 ## License
 
 

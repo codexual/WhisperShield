@@ -1,0 +1,256 @@
+/* WhisperShield overlay_panel.css v0.3.1 */
+/* Styling for the on-page overlay filter panel */
+
+#tfFilterPanel {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
+  width: 220px;
+  background: #1f1f23;
+  border: 1px solid #464649;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 13px;
+  color: #efeff1;
+  user-select: none;
+}
+
+.tf-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: #9147ff;
+  border-radius: 7px 7px 0 0;
+  cursor: move;
+}
+
+.tf-panel-title {
+  font-weight: 600;
+  font-size: 14px;
+  color: #ffffff;
+}
+
+.tf-panel-minimize {
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: bold;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.tf-panel-minimize:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.tf-panel-content {
+  padding: 12px;
+}
+
+.tf-category-toggles {
+  margin-bottom: 12px;
+}
+
+.tf-toggle {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  cursor: pointer;
+  padding: 4px 0;
+  transition: background-color 0.2s;
+  border-radius: 4px;
+}
+
+.tf-toggle:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.tf-toggle input[type="checkbox"] {
+  margin: 0 8px 0 0;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #9147ff;
+}
+
+.tf-toggle-label {
+  flex: 1;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.tf-toggle[data-category="whitelist"] .tf-toggle-label {
+  color: #00d562;
+}
+
+.tf-toggle[data-category="greylist"] .tf-toggle-label {
+  color: #ffb84d;
+}
+
+.tf-toggle[data-category="blacklist"] .tf-toggle-label {
+  color: #ff5c5c;
+}
+
+.tf-toggle[data-category="unknown"] .tf-toggle-label {
+  color: #adadb8;
+}
+
+.tf-bulk-actions {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.tf-bulk-btn {
+  flex: 1;
+  min-width: 60px;
+  padding: 6px 8px;
+  background: #464649;
+  border: 1px solid #53535f;
+  border-radius: 4px;
+  color: #efeff1;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tf-bulk-btn:hover {
+  background: #53535f;
+  border-color: #676774;
+}
+
+.tf-bulk-btn:active {
+  transform: translateY(1px);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.tf-panel-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.tf-action-btn {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tf-save {
+  background: #00d562;
+  color: #ffffff;
+}
+
+.tf-save:hover {
+  background: #00b050;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 213, 98, 0.4);
+}
+
+.tf-save-reload {
+  background: #9147ff;
+  color: #ffffff;
+}
+
+.tf-save-reload:hover {
+  background: #7c3aed;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(145, 71, 255, 0.4);
+}
+
+.tf-action-btn:active {
+  transform: translateY(0);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  #tfFilterPanel {
+    width: 200px;
+    right: 10px;
+    top: 10px;
+  }
+  
+  .tf-panel-content {
+    padding: 10px;
+  }
+  
+  .tf-bulk-actions {
+    flex-direction: column;
+  }
+  
+  .tf-bulk-btn {
+    flex: none;
+  }
+}
+
+/* Animation for panel appearance */
+@keyframes tfSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+#tfFilterPanel {
+  animation: tfSlideIn 0.3s ease-out;
+}
+
+/* Minimized state */
+#tfFilterPanel.minimized .tf-panel-content {
+  display: none !important;
+}
+
+/* Focus styles for accessibility */
+.tf-toggle input[type="checkbox"]:focus,
+.tf-bulk-btn:focus,
+.tf-action-btn:focus,
+.tf-panel-minimize:focus {
+  outline: 2px solid #9147ff;
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  #tfFilterPanel {
+    border: 2px solid #ffffff;
+  }
+  
+  .tf-panel-header {
+    border-bottom: 1px solid #ffffff;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  #tfFilterPanel {
+    animation: none;
+  }
+  
+  .tf-toggle,
+  .tf-bulk-btn,
+  .tf-action-btn,
+  .tf-panel-minimize {
+    transition: none;
+  }
+}
