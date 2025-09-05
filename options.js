@@ -503,3 +503,6 @@ document.addEventListener("DOMContentLoaded",()=>{
     updatePauseUI();
   });
 });
+
+// === APPENDED BLOCK (ADD ONLY) ===
+// Future options enhancements placeholder.
