@@ -35,8 +35,8 @@ const DEFAULT_SETTINGS = {
     cache: { whitelist: [], greylist: [], blacklist: [] }
   },
   oauth: {
-    clientId: "n7bhafdennd00nxdsa15q6hpt619ht",
-    clientSecret: "q2evpzcw2j59edvlfax0s131dc4vb2",
+    clientId: "",
+    clientSecret: "",
     mode: "app",
     accessToken: "",
     accessTokenExp: 0,
