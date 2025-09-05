@@ -49,7 +49,7 @@
       if(m.addedNodes){
         for(const n of m.addedNodes){
           if(!(n instanceof HTMLElement)) continue;
-          if(/has raided|is raiding|incoming raid/i.test(n.textContent||"")){
+            if(/has raided|is raiding|incoming raid/i.test(n.textContent||"")){
             send("RAID_DETECTED",{fromStreamer:"",fromCategory:""});
           }
         }
@@ -66,4 +66,12 @@
   emitNavigation();
   checkCategory();
   send("DEBUG_LOG",{version:LOCAL_VERSION});
+})();
+
+// === APPENDED BLOCK (ADD ONLY) ===
+// Reserved for future DOM classification hints (currently no-op).
+(function(){
+  if (window.__WS_CONTENT_APPEND__) return;
+  window.__WS_CONTENT_APPEND__ = true;
+  // Placeholder: could emit periodic hints or prefetch categories.
 })();
