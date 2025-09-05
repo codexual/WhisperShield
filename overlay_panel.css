@@ -1,4 +1,4 @@
-/* WhisperShield overlay_panel.css v0.3.1 */
+/* WhisperShield overlay_panel.css v0.0.1 */
 /* Styling for the on-page overlay filter panel */
 
 #tfFilterPanel {
@@ -252,5 +252,127 @@
   .tf-action-btn,
   .tf-panel-minimize {
     transition: none;
+  }
+}
+
+/* === Appended enhancements v0.3.2 (non-destructive) === */
+#tfFilterPanel {
+  /* Elevate above Twitch popouts */
+  z-index: 2147483647;
+}
+
+#tfFilterPanel[data-ws-dragging="1"] {
+  opacity: 0.92;
+  transition: opacity 0.1s;
+}
+
+/* Optional visual classification hooks (future styling possibility) */
+[data-ws-classification="whitelist"] {}
+[data-ws-classification="greylist"] {}
+[data-ws-classification="blacklist"] {}
+[data-ws-classification="unknown"] {}
+
+/* === APPENDED BLOCK (ADD ONLY): Hide-all mode styling === */
+body.ws-hide-all article[data-a-target^="card-"],
+body.ws-hide-all a[data-a-target="preview-card-image-link"],
+body.ws-hide-all a[href^="/"][data-test-selector="PreviewCard-link"] {
+  display: none !important;
+}
+
+#tfFilterPanel button.ws-hide-toggle-active {
+  box-shadow: 0 0 0 2px #ff5c5c inset;
+  background:#ff5c5c !important;
+  color:#fff !important;
+}
+
+/* =========================================================================================
+   === APPENDED BLOCK (ADD ONLY) v0.0.1: EXTREME DEBUG LOGGER UI + HIDE ALL LAYOUT FIX CSS ===
+   ========================================================================================= */
+#tfFilterPanel .ws-debug-tools {
+  margin-top:8px;
+  border-top:1px solid #2f2f34;
+  padding-top:6px;
+  font-size:11px;
+}
+#tfFilterPanel .ws-debug-row {
+  display:flex;
+  flex-wrap:wrap;
+  gap:4px;
+  align-items:center;
+}
+#tfFilterPanel .ws-debug-row label.ws-debug-flag {
+  display:flex;
+  align-items:center;
+  gap:4px;
+  padding:2px 6px;
+  background:#2a2a2f;
+  border:1px solid #3a3a42;
+  border-radius:4px;
+  cursor:pointer;
+  font-weight:600;
+  font-size:11px;
+}
+#tfFilterPanel .ws-debug-row label.ws-debug-flag input {
+  margin:0;
+}
+#tfFilterPanel .ws-debug-btn {
+  background:#464649;
+  border:1px solid #5a5a63;
+  color:#efeff1;
+  font-size:11px;
+  padding:4px 6px;
+  border-radius:4px;
+  cursor:pointer;
+  flex:0 0 auto;
+  transition:background .15s,border-color .15s;
+}
+#tfFilterPanel .ws-debug-btn:hover {
+  background:#52525b;
+  border-color:#6c6c77;
+}
+#tfFilterPanel .ws-debug-btn.danger {
+  background:#7d1f1f;
+  border-color:#a43737;
+}
+#tfFilterPanel .ws-debug-btn.danger:hover {
+  background:#9a2626;
+  border-color:#c64949;
+}
+#tfFilterPanel .ws-debug-status {
+  margin-top:4px;
+  font-size:10px;
+  opacity:.75;
+  line-height:1.3;
+  word-break:break-word;
+}
+/* Force action row to wrap so Hide All doesn't overlap */
+#tfFilterPanel .tf-panel-actions {
+  flex-wrap:wrap;
+}
+#tfFilterPanel .tf-panel-actions button[data-ws-hide-all-btn],
+#tfFilterPanel button.ws-hide-all-fullwidth {
+  flex:1 1 100% !important;
+  width:100%;
+  margin-top:4px;
+}
+
+/* =========================================================================================
+   === APPENDED BLOCK (ADD ONLY) v0.3.8 ADVANCED DIAGNOSTICS BUTTONS STYLES (extra)       ===
+   ========================================================================================= */
+#tfFilterPanel .ws-adv-row {
+  margin-top:4px;
+  border-top:1px dashed #3a3a40;
+  padding-top:4px;
+}
+#tfFilterPanel .ws-adv-row .ws-debug-btn {
+  flex:1 1 calc(50% - 6px);
+  min-width:95px;
+}
+#tfFilterPanel .ws-adv-row .ws-debug-btn.danger {
+  flex:1 1 100%;
+}
+@media (max-width: 360px){
+  #tfFilterPanel .ws-adv-row .ws-debug-btn {
+    flex:1 1 100%;
   }
 }
