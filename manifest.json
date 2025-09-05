@@ -31,13 +31,24 @@
     },
     {
       "matches": ["https://www.twitch.tv/directory/category/asmr*"],
-      "js": ["overlay_panel.js"],
+      "js": [
+        "overlay_panel.js",
+        "asmr-hide-module.js",
+        "asmr-hide-counter.js"
+      ],
       "run_at": "document_idle"
     }
   ],
   "web_accessible_resources": [
     {
       "resources": ["overlay_panel.css"],
+      "matches": ["https://*.twitch.tv/*"]
+    },
+    {
+      "resources": [
+        "asmr-hide-module.js",
+        "asmr-hide-counter.js"
+      ],
       "matches": ["https://*.twitch.tv/*"]
     }
   ]
