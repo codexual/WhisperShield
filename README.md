@@ -158,9 +158,9 @@ Only optional Twitch API requests (standard Helix endpoints). Lists/logs stay lo
 
 ---
 
-## NEW Additions
+## Overlay Panel / ASMR Catalog/Directory (STILL W.I.P.)
 
-**On-Page Overlay Panel (v0.3.1)**
+**On-Page Overlay Panel (v0.0.1)**
 - Added real-time category filter panel visible on ASMR directory pages
 - Toggle visibility for whitelist/greylist/blacklist/unknown streamers directly on-page
 - Bulk actions (All On, All Off, Invert) and Save/Save+Reload functionality
